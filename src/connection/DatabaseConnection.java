@@ -12,7 +12,7 @@ public class DatabaseConnection {
 
     // データベースに接続
     public void connect(int localPort) throws Exception {
-        String dbUrl = "jdbc:postgresql://localhost:" + localPort + "/tutorial";
+        String dbUrl = "jdbc:postgresql://localhost:" + localPort + "/postgres";
         Class.forName("org.postgresql.Driver");
         connection = DriverManager.getConnection(dbUrl, DB_USER, DB_PASSWORD);
         System.out.println("PostgreSQLに接続成功");
