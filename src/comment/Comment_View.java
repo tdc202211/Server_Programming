@@ -1,4 +1,4 @@
-package comment_view;
+package comment;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;

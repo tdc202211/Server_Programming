@@ -9,7 +9,7 @@ import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
 
-import comment_view.Comment_View;
+import comment.Comment_View;
 
 public class DatabaseConnection {
 	private static final String DB_USER = "postgres"; // PostgreSQLのユーザー
@@ -70,6 +70,7 @@ public class DatabaseConnection {
 		return false; // パスワードが一致しない場合はfalseを返す
 	}
 
+	//コメントの表示
 	public List<Comment_View> getAllComments() {
 	    String query = "SELECT * FROM comment";
 	    List<Comment_View> comments = new ArrayList<>();
@@ -85,6 +86,28 @@ public class DatabaseConnection {
 	    }
 	    return comments;
 	}
+	
+	//コメントの追加
+	public boolean addComment(int classId, String userId, Integer parentCommentId, String content) {
+	    String query = "INSERT INTO comment (\"授業id\", \"ユーザid\", \"親コメント\", \"コメント本文\") VALUES (?, ?, ?, ?)";
+	    try (PreparedStatement pstmt = connection.prepareStatement(query)) {
+	        pstmt.setInt(1, classId);
+	        pstmt.setString(2, userId);
+	        if (parentCommentId != null) {
+	            pstmt.setInt(3, parentCommentId);
+	        } else {
+	            pstmt.setNull(3, java.sql.Types.INTEGER);
+	        }
+	        pstmt.setString(4, content);
+
+	        int rowsAffected = pstmt.executeUpdate();
+	        return rowsAffected > 0; // 挿入成功の場合はtrueを返す
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        return false; // 挿入失敗の場合はfalseを返す
+	    }
+	}
+
 
 	// 新規ユーザー登録
 	public boolean registerUser(String email, String password) {
@@ -102,6 +125,7 @@ public class DatabaseConnection {
 		}
 		return false; // 登録失敗の場合はfalseを返す
 	}
+	
 	// パスワードのハッシュ化
     private String hashPassword(String password) {
         try {
