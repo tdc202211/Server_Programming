@@ -1,5 +1,5 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<%@ page import="java.util.*, connection.DatabaseConnection, connection.SSHConnection, comment_view.Comment_View" %>
+<%@ page import="java.util.*, connection.DatabaseConnection, connection.SSHConnection, comment.Comment_View" %>
 <!DOCTYPE html>
 <html>
 <head>
