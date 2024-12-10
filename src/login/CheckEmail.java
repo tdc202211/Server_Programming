@@ -1,4 +1,4 @@
-package test;
+package login;
 
 import java.io.IOException;
 
@@ -8,6 +8,9 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import connection.DatabaseConnection;
+import connection.SSHConnection;
+
 @WebServlet("/CheckEmail")
 public class CheckEmail extends HttpServlet {
     private static final long serialVersionUID = 1L;
@@ -15,8 +18,8 @@ public class CheckEmail extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String email = request.getParameter("email");
 
-        SSHConnection sshConnection = new SSHConnection();
-        DatabaseConnection dbConnection = new DatabaseConnection();
+        connection.SSHConnection sshConnection = new SSHConnection();
+        connection.DatabaseConnection dbConnection = new DatabaseConnection();
 
         try {
             // SSH接続とDB接続を確立

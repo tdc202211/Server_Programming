@@ -1,4 +1,4 @@
-package test;
+package login;
 
 import java.io.IOException;
 
@@ -8,6 +8,9 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import connection.DatabaseConnection;
+import connection.SSHConnection;
+
 @WebServlet("/CheckPassword")
 public class CheckPassword extends HttpServlet {
     private static final long serialVersionUID = 1L;
@@ -16,8 +19,8 @@ public class CheckPassword extends HttpServlet {
         String email = request.getParameter("email");
         String password = request.getParameter("password");
 
-        SSHConnection sshConnection = new SSHConnection();
-        DatabaseConnection dbConnection = new DatabaseConnection();
+        connection.SSHConnection sshConnection = new SSHConnection();
+        connection.DatabaseConnection dbConnection = new DatabaseConnection();
 
         try {
             // SSH接続とDB接続を確立
