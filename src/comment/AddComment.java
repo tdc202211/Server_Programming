@@ -16,6 +16,10 @@ public class AddComment extends HttpServlet {
     private static final long serialVersionUID = 1L;
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        // リクエストとレスポンスの文字エンコーディングをUTF-8に設定
+        request.setCharacterEncoding("UTF-8");
+        response.setContentType("text/html; charset=UTF-8");
+
         String userId = request.getParameter("userId");
         int classId = Integer.parseInt(request.getParameter("classId"));
         String content = request.getParameter("content");

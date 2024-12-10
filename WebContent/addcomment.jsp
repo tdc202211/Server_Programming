@@ -1,4 +1,5 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ page contentType="text/html; charset=UTF-8" language="java" %>
+<%@ page pageEncoding="UTF-8" %>
 <!DOCTYPE html>
 <html>
 <head>
@@ -6,7 +7,7 @@
 </head>
 <body>
     <h1>コメントを追加</h1>
-    <form action="AddComment" method="post">
+    <form action="AddComment" method="post" accept-charset="UTF-8">
         <label for="classId">授業ID:</label>
         <input type="number" id="classId" name="classId" required><br><br>
 

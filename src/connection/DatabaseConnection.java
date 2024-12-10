@@ -70,24 +70,7 @@ public class DatabaseConnection {
 		return false; // パスワードが一致しない場合はfalseを返す
 	}
 
-	//コメントの表示
-	public List<Comment_View> getAllComments() {
-	    String query = "SELECT * FROM comment";
-	    List<Comment_View> comments = new ArrayList<>();
-
-	    try (PreparedStatement pstmt = connection.prepareStatement(query);
-	         ResultSet rs = pstmt.executeQuery()) {
-
-	        while (rs.next()) {
-	            comments.add(Comment_View.fromResultSet(rs));
-	        }
-	    } catch (Exception e) {
-	        e.printStackTrace();
-	    }
-	    return comments;
-	}
-	
-	//コメントの追加
+	// コメントの追加
 	public boolean addComment(int classId, String userId, Integer parentCommentId, String content) {
 	    String query = "INSERT INTO comment (\"授業id\", \"ユーザid\", \"親コメント\", \"コメント本文\") VALUES (?, ?, ?, ?)";
 	    try (PreparedStatement pstmt = connection.prepareStatement(query)) {
@@ -107,6 +90,24 @@ public class DatabaseConnection {
 	        return false; // 挿入失敗の場合はfalseを返す
 	    }
 	}
+
+	// コメントの取得
+	public List<Comment_View> getAllComments() {
+	    String query = "SELECT * FROM comment";
+	    List<Comment_View> comments = new ArrayList<>();
+
+	    try (PreparedStatement pstmt = connection.prepareStatement(query);
+	         ResultSet rs = pstmt.executeQuery()) {
+
+	        while (rs.next()) {
+	            comments.add(Comment_View.fromResultSet(rs));
+	        }
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	    }
+	    return comments;
+	}
+
 
 
 	// 新規ユーザー登録
