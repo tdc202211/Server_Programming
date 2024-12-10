@@ -4,6 +4,10 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.util.ArrayList;
+import java.util.List;
+
+import comment_view.Comment_View;
 
 public class DatabaseConnection {
     private static final String DB_USER = "postgres"; // PostgreSQLのユーザー
@@ -61,5 +65,30 @@ public class DatabaseConnection {
             e.printStackTrace();
         }
         return false; // パスワードが一致しない場合はfalseを返す
+    }
+    
+    public List<Comment_View> getComments() {
+        String query = "SELECT \"コメントid\", \"授業id\", \"ユーザid\", \"親コメント\", \"日付\", \"コメント本文\" FROM comment";
+        List<Comment_View> comments = new ArrayList<>();
+
+        try (PreparedStatement pstmt = connection.prepareStatement(query);
+             ResultSet rs = pstmt.executeQuery()) {
+
+            while (rs.next()) {
+                Comment_View comment = new Comment_View(
+                        rs.getInt("コメントid"),
+                        rs.getInt("授業id"),
+                        rs.getString("ユーザid"),
+                        (Integer) rs.getObject("親コメント"), // NULLを許容
+                        rs.getTimestamp("日付"),
+                        rs.getString("コメント本文")
+                );
+                comments.add(comment);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return comments;
     }
 }
