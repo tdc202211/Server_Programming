@@ -15,5 +15,11 @@
     <% if (request.getAttribute("error") != null) { %>
         <p style="color: red;"><%= request.getAttribute("error") %></p>
     <% } %>
+
+<!-- 新規登録ボタンを追加 -->
+<form action="register.jsp" method="get">
+    <button type="submit">新規登録</button>
+</form>
+
 </body>
 </html>
