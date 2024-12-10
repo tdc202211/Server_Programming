@@ -70,28 +70,20 @@ public class DatabaseConnection {
 		return false; // パスワードが一致しない場合はfalseを返す
 	}
 
-	public List<Comment_View> getComments() {
-		String query = "SELECT \"コメントid\", \"授業id\", \"ユーザid\", \"親コメント\", \"日付\", \"コメント本文\" FROM comment";
-		List<Comment_View> comments = new ArrayList<>();
+	public List<Comment_View> getAllComments() {
+	    String query = "SELECT * FROM comment";
+	    List<Comment_View> comments = new ArrayList<>();
 
-		try (PreparedStatement pstmt = connection.prepareStatement(query);
-				ResultSet rs = pstmt.executeQuery()) {
+	    try (PreparedStatement pstmt = connection.prepareStatement(query);
+	         ResultSet rs = pstmt.executeQuery()) {
 
-			while (rs.next()) {
-				Comment_View comment = new Comment_View(
-						rs.getInt("コメントid"),
-						rs.getInt("授業id"),
-						rs.getString("ユーザid"),
-						(Integer) rs.getObject("親コメント"), // NULLを許容
-						rs.getTimestamp("日付"),
-						rs.getString("コメント本文"));
-				comments.add(comment);
-			}
-
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return comments;
+	        while (rs.next()) {
+	            comments.add(Comment_View.fromResultSet(rs));
+	        }
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	    }
+	    return comments;
 	}
 
 	// 新規ユーザー登録
