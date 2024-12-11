@@ -9,7 +9,7 @@ import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
 
-import comment_view.Comment_View;
+import comment.Comment_View;
 
 
 public class DatabaseConnection {
@@ -71,40 +71,64 @@ public class DatabaseConnection {
         return false; // パスワードが一致しない場合はfalseを返す
     }
 
-	public List<Comment_View> getComments() {
-		String query = "SELECT \"コメントid\", \"授業id\", \"ユーザid\", \"親コメント\", \"日付\", \"コメント本文\" FROM comment";
-		List<Comment_View> comments = new ArrayList<>();
+	// コメントの追加
+	public boolean addComment(int classId, String userId, Integer parentCommentId, String content) {
+	    String query = "INSERT INTO comment (\"授業id\", \"ユーザid\", \"親コメント\", \"コメント本文\") VALUES (?, ?, ?, ?)";
+	    try (PreparedStatement pstmt = connection.prepareStatement(query)) {
+	        pstmt.setInt(1, classId);
+	        pstmt.setString(2, userId);
+	        if (parentCommentId != null) {
+	            pstmt.setInt(3, parentCommentId);
+	        } else {
+	            pstmt.setNull(3, java.sql.Types.INTEGER);
+	        }
+	        pstmt.setString(4, content);
 
-		try (PreparedStatement pstmt = connection.prepareStatement(query);
-				ResultSet rs = pstmt.executeQuery()) {
-
-			while (rs.next()) {
-				Comment_View comment = new Comment_View(
-						rs.getInt("コメントid"),
-						rs.getInt("授業id"),
-						rs.getString("ユーザid"),
-						(Integer) rs.getObject("親コメント"), // NULLを許容
-						rs.getTimestamp("日付"),
-						rs.getString("コメント本文"));
-				comments.add(comment);
-			}
-
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return comments;
+	        int rowsAffected = pstmt.executeUpdate();
+	        return rowsAffected > 0; // 挿入成功の場合はtrueを返す
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        return false; // 挿入失敗の場合はfalseを返す
+	    }
 	}
 
+<<<<<<< HEAD
 	
     // 新規ユーザー登録
     public boolean registerUser(String email, String password) {
         String hashedPassword = hashPassword(password);
         String query = "INSERT INTO users (\"メールアドレス\", \"パスワード\") VALUES (?, ?)";
+=======
+	// コメントの取得
+	public List<Comment_View> getAllComments() {
+	    String query = "SELECT * FROM comment";
+	    List<Comment_View> comments = new ArrayList<>();
+
+	    try (PreparedStatement pstmt = connection.prepareStatement(query);
+	         ResultSet rs = pstmt.executeQuery()) {
+
+	        while (rs.next()) {
+	            comments.add(Comment_View.fromResultSet(rs));
+	        }
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	    }
+	    return comments;
+	}
+
+
+
+	// 新規ユーザー登録
+	public boolean registerUser(String email, String password) {
+		String hashedPassword = hashPassword(password);
+		String query = "INSERT INTO users (\"メールアドレス\", \"パスワード\") VALUES (?, ?)";
+>>>>>>> branch 'master' of https://github.com/tdc202211/Server_Programming.git
 
         try (PreparedStatement pstmt = connection.prepareStatement(query)) {
             pstmt.setString(1, email);
             pstmt.setString(2, hashedPassword);
 
+<<<<<<< HEAD
             int rowsAffected = pstmt.executeUpdate();
             return rowsAffected > 0; // 登録成功の場合はtrueを返す
         } catch (Exception e) {
@@ -114,6 +138,17 @@ public class DatabaseConnection {
     }
 
     // パスワードのハッシュ化
+=======
+			int rowsAffected = pstmt.executeUpdate();
+			return rowsAffected > 0; // 登録成功の場合はtrueを返す
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return false; // 登録失敗の場合はfalseを返す
+	}
+	
+	// パスワードのハッシュ化
+>>>>>>> branch 'master' of https://github.com/tdc202211/Server_Programming.git
     private String hashPassword(String password) {
         try {
             MessageDigest md = MessageDigest.getInstance("MD5");
