@@ -92,13 +92,6 @@ public class DatabaseConnection {
 	    }
 	}
 
-<<<<<<< HEAD
-	
-    // 新規ユーザー登録
-    public boolean registerUser(String email, String password) {
-        String hashedPassword = hashPassword(password);
-        String query = "INSERT INTO users (\"メールアドレス\", \"パスワード\") VALUES (?, ?)";
-=======
 	// コメントの取得
 	public List<Comment_View> getAllComments() {
 	    String query = "SELECT * FROM comment";
@@ -122,23 +115,11 @@ public class DatabaseConnection {
 	public boolean registerUser(String email, String password) {
 		String hashedPassword = hashPassword(password);
 		String query = "INSERT INTO users (\"メールアドレス\", \"パスワード\") VALUES (?, ?)";
->>>>>>> branch 'master' of https://github.com/tdc202211/Server_Programming.git
 
         try (PreparedStatement pstmt = connection.prepareStatement(query)) {
             pstmt.setString(1, email);
             pstmt.setString(2, hashedPassword);
 
-<<<<<<< HEAD
-            int rowsAffected = pstmt.executeUpdate();
-            return rowsAffected > 0; // 登録成功の場合はtrueを返す
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return false; // 登録失敗の場合はfalseを返す
-    }
-
-    // パスワードのハッシュ化
-=======
 			int rowsAffected = pstmt.executeUpdate();
 			return rowsAffected > 0; // 登録成功の場合はtrueを返す
 		} catch (Exception e) {
@@ -148,7 +129,6 @@ public class DatabaseConnection {
 	}
 	
 	// パスワードのハッシュ化
->>>>>>> branch 'master' of https://github.com/tdc202211/Server_Programming.git
     private String hashPassword(String password) {
         try {
             MessageDigest md = MessageDigest.getInstance("MD5");
