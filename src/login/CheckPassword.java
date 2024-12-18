@@ -1,13 +1,16 @@
 package login;
 
 import java.io.IOException;
+import java.util.List;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
+import connection.ClassInfo;
 import connection.DatabaseConnection;
 import connection.SSHConnection;
 
@@ -35,7 +38,15 @@ public class CheckPassword extends HttpServlet {
 
             if (isValid) {
                 // ログイン成功
-                request.getRequestDispatcher("welcome.jsp").forward(request, response);
+            	// 授業情報をセッションスコープに保存
+            	List<ClassInfo> classList = dbConnection.getAllClasses();
+            	HttpSession session = request.getSession();
+            	session.setAttribute("classList", classList);
+
+            	// リダイレクト
+            	response.sendRedirect("classView.jsp");
+
+                //response.sendRedirect("classView.jsp");
             } else {
                 // ログイン失敗（再入力画面に戻る）
                 request.setAttribute("error", "パスワードが間違っています");
