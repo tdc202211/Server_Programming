@@ -8,6 +8,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import banlist.BanList;
 import connection.DatabaseConnection;
 import connection.SSHConnection;
 
@@ -20,16 +21,22 @@ public class CheckEmail extends HttpServlet {
 
         connection.SSHConnection sshConnection = new SSHConnection();
         connection.DatabaseConnection dbConnection = new DatabaseConnection();
+        BanList banList = null;
 
         try {
             // SSH接続とDB接続を確立
             sshConnection.connect();
             dbConnection.connect(sshConnection.getLocalPort());
+            banList = new BanList(dbConnection.getConnection());
 
             // メールアドレスの存在確認
             boolean exists = dbConnection.isEmailExists(email);
-
-            if (exists) {
+            
+            if (banList.isBanned(email)) {
+            	request.setAttribute("error", "あなたはバンされています");
+            	request.getRequestDispatcher("emailInput.jsp").forward(request, response);
+            	}
+            else if (exists) {
                 // メールアドレスが存在する場合、パスワード入力画面へ遷移
                 request.setAttribute("email", email); // 次の画面に渡す
                 request.getRequestDispatcher("passwordInput.jsp").forward(request, response);
