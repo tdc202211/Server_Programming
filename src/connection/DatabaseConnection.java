@@ -6,6 +6,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -127,6 +128,37 @@ public class DatabaseConnection {
 		}
 		return false; // 登録失敗の場合はfalseを返す
 	}
+	
+	// 授業情報の取得
+    public List<ClassInfo> getAllClasses() throws SQLException {
+        List<ClassInfo> classList = new ArrayList<>();
+        String sql = "SELECT 授業id, 授業名, 年度, 前期後期, 曜日, 時限, 教授名, 概要 FROM classes";
+        
+        try (PreparedStatement statement = connection.prepareStatement(sql);
+             ResultSet resultSet = statement.executeQuery()) {
+
+            while (resultSet.next()) {
+                ClassInfo classInfo = new ClassInfo(
+                        resultSet.getInt("授業id"),
+                        resultSet.getString("授業名"),
+                        resultSet.getInt("年度"),
+                        resultSet.getString("前期後期"),
+                        resultSet.getString("曜日"),
+                        resultSet.getInt("時限"),
+                        resultSet.getString("教授名"),
+                        resultSet.getString("概要")
+                );
+                classList.add(classInfo);
+            }
+            System.out.println("取得した授業情報数: " + classList.size());
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new SQLException("Error executing query: " + sql, e);
+        }
+        return classList;
+    }
+
+
 	
 	// パスワードのハッシュ化
     private String hashPassword(String password) {
