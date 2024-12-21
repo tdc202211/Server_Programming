@@ -10,6 +10,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import banlist.BanListInfo;
 import comment.Comment_View;
 
 public class DatabaseConnection {
@@ -156,8 +157,28 @@ public class DatabaseConnection {
         }
         return classList;
     }
+    
+    public List<BanListInfo> getActiveUsers() {
+        List<BanListInfo> userList = new ArrayList<>();
+        String query = "SELECT \"ユーザid\", \"メールアドレス\" FROM users WHERE is_banned = FALSE";
 
+        try (PreparedStatement pstmt = connection.prepareStatement(query);
+             ResultSet rs = pstmt.executeQuery()) {
 
+            while (rs.next()) {
+                BanListInfo user = new BanListInfo(
+                    rs.getString("ユーザid"),
+                    rs.getString("メールアドレス")
+                );
+                userList.add(user);
+            }
+            System.out.println("取得したユーザ数: " + userList.size());
+        } catch (SQLException e) {
+            System.out.println("クエリ実行エラー");
+            e.printStackTrace();
+        }
+        return userList;
+    }
 	
 	// パスワードのハッシュ化
     private String hashPassword(String password) {
