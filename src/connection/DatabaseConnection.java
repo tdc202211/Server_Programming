@@ -10,7 +10,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import banlist.BanlistView;
 import comment.Comment_View;
 
 public class DatabaseConnection {
@@ -271,30 +270,7 @@ public class DatabaseConnection {
             return false;
         }
     }
-    
-    public List<BanlistView> getBanlist() {
-        String query = "SELECT b.\"バンid\", b.\"ユーザid\", u.\"ユーザ名\" " +
-                       "FROM banlist b JOIN users u ON b.\"ユーザid\" = u.\"ユーザid\"";
-        List<BanlistView> banlist = new ArrayList<>();
-
-        try (PreparedStatement pstmt = connection.prepareStatement(query);
-             ResultSet rs = pstmt.executeQuery()) {
-
-            while (rs.next()) {
-                banlist.add(new BanlistView(
-                    rs.getInt("バンid"),
-                    rs.getString("ユーザid"),
-                    rs.getString("ユーザ名")
-                ));
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return banlist;
-    }
-
-
-    
+        
 	// パスワードのハッシュ化
     private String hashPassword(String password) {
         try {
