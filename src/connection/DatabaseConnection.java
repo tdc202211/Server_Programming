@@ -247,7 +247,26 @@ public class DatabaseConnection {
             return false; // 削除失敗の場合はfalseを返す
         }
     }
+    
+    public boolean updateClassInfo(int classId, String className, int year, String term, String day, int period, String professor, String description) {
+        String query = "UPDATE classes SET \"授業名\" = ?, \"年度\" = ?, \"前期後期\" = ?, \"曜日\" = ?, \"時限\" = ?, \"教授名\" = ?, \"概要\" = ? WHERE \"授業id\" = ?";
+        try (PreparedStatement pstmt = connection.prepareStatement(query)) {
+            pstmt.setString(1, className);
+            pstmt.setInt(2, year);
+            pstmt.setString(3, term);
+            pstmt.setString(4, day);
+            pstmt.setInt(5, period);
+            pstmt.setString(6, professor);
+            pstmt.setString(7, description);
+            pstmt.setInt(8, classId);
 
+            int rowsAffected = pstmt.executeUpdate();
+            return rowsAffected > 0; // 更新成功の場合はtrueを返す
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
     
 	// パスワードのハッシュ化
     private String hashPassword(String password) {
