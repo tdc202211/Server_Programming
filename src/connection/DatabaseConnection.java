@@ -157,6 +157,41 @@ public class DatabaseConnection {
         return classList;
     }
 
+ // 授業の追加
+    public boolean addClass(String className, int year, String semester, String day, int period, String instructor, String description) {
+        String query = "INSERT INTO classes (\"授業名\", \"年度\", \"前期後期\", \"曜日\", \"時限\", \"教授名\", \"概要\") VALUES (?, ?, ?, ?, ?, ?, ?)";
+        try (PreparedStatement pstmt = connection.prepareStatement(query)) {
+            // Debug用: 値を出力して確認
+            System.out.println("semester: " + semester);
+            System.out.println("instructor: " + instructor);
+
+            // 「前期後期」に値がない場合、デフォルト値を設定
+            if (semester == null || semester.isEmpty()) {
+                semester = "前期"; // 必要に応じてデフォルト値を変更
+            }
+
+            // 「教授名」に値がない場合、デフォルト値を設定
+            if (instructor == null || instructor.isEmpty()) {
+                instructor = "未定"; // 必要に応じてデフォルト値を変更
+            }
+
+            // パラメータ設定
+            pstmt.setString(1, className);
+            pstmt.setInt(2, year);
+            pstmt.setString(3, semester);
+            pstmt.setString(4, day);
+            pstmt.setInt(5, period);
+            pstmt.setString(6, instructor);
+            pstmt.setString(7, description);
+
+            // クエリ実行
+            int rowsAffected = pstmt.executeUpdate();
+            return rowsAffected > 0; // 挿入成功の場合は true を返す
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false; // 挿入失敗の場合は false を返す
+        }
+    }
 
 	
 	// パスワードのハッシュ化
