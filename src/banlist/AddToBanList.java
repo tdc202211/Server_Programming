@@ -19,8 +19,7 @@ public class AddToBanList extends HttpServlet {
         request.setCharacterEncoding("UTF-8");
         response.setContentType("text/html; charset=UTF-8");
 
-        String userId = request.getParameter("userId");
-        int commentId = Integer.parseInt(request.getParameter("commentId"));
+        String userId = request.getParameter("userId"); // ユーザIDのみ取得
         SSHConnection sshConnection = new SSHConnection();
         DatabaseConnection dbConnection = new DatabaseConnection();
 
@@ -28,10 +27,11 @@ public class AddToBanList extends HttpServlet {
             sshConnection.connect();
             dbConnection.connect(sshConnection.getLocalPort());
 
-            boolean isBanned = dbConnection.addUserToBanList(userId, commentId);
+            // ユーザをバンリストに追加し、is_bannedをTRUEに設定
+            boolean isBanned = dbConnection.addUserToBanList(userId);
 
             if (isBanned) {
-                response.sendRedirect("banlistView.jsp");
+                response.sendRedirect("banlistView.jsp"); // バンリスト表示ページ
             } else {
                 request.setAttribute("error", "バンリストへの追加に失敗しました");
                 request.getRequestDispatcher("addToBanList.jsp").forward(request, response);

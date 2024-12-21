@@ -10,6 +10,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import banlist.BanlistView;
 import comment.Comment_View;
 
 public class DatabaseConnection {
@@ -157,22 +158,21 @@ public class DatabaseConnection {
         return classList;
     }
     
-    public boolean addUserToBanList(String userId, int commentId) {
-        String banlistQuery = "INSERT INTO banlist (\"ユーザid\", \"コメント\") VALUES (?, ?)";
+    public boolean addUserToBanList(String userId) {
+        String insertBanlistQuery = "INSERT INTO banlist (\"ユーザid\") VALUES (?)";
         String updateUserQuery = "UPDATE users SET is_banned = TRUE WHERE \"ユーザid\" = ?";
 
         try {
             // トランザクション開始
             connection.setAutoCommit(false);
 
-            // バンリストへの追加
-            try (PreparedStatement pstmtBanlist = connection.prepareStatement(banlistQuery)) {
+            // バンリストにユーザを追加
+            try (PreparedStatement pstmtBanlist = connection.prepareStatement(insertBanlistQuery)) {
                 pstmtBanlist.setString(1, userId);
-                pstmtBanlist.setInt(2, commentId);
                 pstmtBanlist.executeUpdate();
             }
 
-            // ユーザのis_bannedをTRUEに更新
+            // ユーザのis_bannedをTRUEに設定
             try (PreparedStatement pstmtUpdateUser = connection.prepareStatement(updateUserQuery)) {
                 pstmtUpdateUser.setString(1, userId);
                 pstmtUpdateUser.executeUpdate();
@@ -181,23 +181,27 @@ public class DatabaseConnection {
             // コミット
             connection.commit();
             return true;
+
         } catch (Exception e) {
             try {
-                // ロールバック
+                // エラーが発生した場合はロールバック
                 connection.rollback();
-            } catch (SQLException rollbackEx) {
+            } catch (Exception rollbackEx) {
                 rollbackEx.printStackTrace();
             }
             e.printStackTrace();
             return false;
+
         } finally {
             try {
-                connection.setAutoCommit(true); // 自動コミットを元に戻す
-            } catch (SQLException autoCommitEx) {
+                // トランザクションを元に戻す
+                connection.setAutoCommit(true);
+            } catch (Exception autoCommitEx) {
                 autoCommitEx.printStackTrace();
             }
         }
     }
+
 
  // 授業の追加
     public boolean addClass(String className, int year, String semester, String day, int period, String instructor, String description) {
@@ -267,6 +271,29 @@ public class DatabaseConnection {
             return false;
         }
     }
+    
+    public List<BanlistView> getBanlist() {
+        String query = "SELECT b.\"バンid\", b.\"ユーザid\", u.\"ユーザ名\" " +
+                       "FROM banlist b JOIN users u ON b.\"ユーザid\" = u.\"ユーザid\"";
+        List<BanlistView> banlist = new ArrayList<>();
+
+        try (PreparedStatement pstmt = connection.prepareStatement(query);
+             ResultSet rs = pstmt.executeQuery()) {
+
+            while (rs.next()) {
+                banlist.add(new BanlistView(
+                    rs.getInt("バンid"),
+                    rs.getString("ユーザid"),
+                    rs.getString("ユーザ名")
+                ));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return banlist;
+    }
+
+
     
 	// パスワードのハッシュ化
     private String hashPassword(String password) {
