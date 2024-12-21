@@ -48,6 +48,10 @@
 <%
     }
 %>
+<!-- 授業追加ボタン -->
+    <form action="addClass.jsp" method="get">
+        <button type="submit">授業を追加</button>
+    </form>
 
 </body>
 </html>
