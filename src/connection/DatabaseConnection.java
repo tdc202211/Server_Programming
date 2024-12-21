@@ -10,7 +10,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import banlist.BanListInfo;
 import comment.Comment_View;
 
 public class DatabaseConnection {
@@ -158,28 +157,52 @@ public class DatabaseConnection {
         return classList;
     }
     
-    public List<BanListInfo> getActiveUsers() {
-        List<BanListInfo> userList = new ArrayList<>();
-        String query = "SELECT \"ユーザid\", \"メールアドレス\" FROM users WHERE is_banned = FALSE";
+    public boolean addUserToBanList(String userId, int commentId) {
+        String banlistQuery = "INSERT INTO banlist (\"ユーザid\", \"コメント\") VALUES (?, ?)";
+        String updateUserQuery = "UPDATE users SET is_banned = TRUE WHERE \"ユーザid\" = ?";
 
-        try (PreparedStatement pstmt = connection.prepareStatement(query);
-             ResultSet rs = pstmt.executeQuery()) {
+        try {
+            // トランザクション開始
+            connection.setAutoCommit(false);
 
-            while (rs.next()) {
-                BanListInfo user = new BanListInfo(
-                    rs.getString("ユーザid"),
-                    rs.getString("メールアドレス")
-                );
-                userList.add(user);
+            // バンリストへの追加
+            try (PreparedStatement pstmtBanlist = connection.prepareStatement(banlistQuery)) {
+                pstmtBanlist.setString(1, userId);
+                pstmtBanlist.setInt(2, commentId);
+                pstmtBanlist.executeUpdate();
             }
-            System.out.println("取得したユーザ数: " + userList.size());
-        } catch (SQLException e) {
-            System.out.println("クエリ実行エラー");
+
+            // ユーザのis_bannedをTRUEに更新
+            try (PreparedStatement pstmtUpdateUser = connection.prepareStatement(updateUserQuery)) {
+                pstmtUpdateUser.setString(1, userId);
+                pstmtUpdateUser.executeUpdate();
+            }
+
+            // コミット
+            connection.commit();
+            return true;
+        } catch (Exception e) {
+            try {
+                // ロールバック
+                connection.rollback();
+            } catch (SQLException rollbackEx) {
+                rollbackEx.printStackTrace();
+            }
             e.printStackTrace();
+            return false;
+        } finally {
+            try {
+                connection.setAutoCommit(true); // 自動コミットを元に戻す
+            } catch (SQLException autoCommitEx) {
+                autoCommitEx.printStackTrace();
+            }
         }
-        return userList;
     }
-	
+
+
+
+
+    
 	// パスワードのハッシュ化
     private String hashPassword(String password) {
         try {
