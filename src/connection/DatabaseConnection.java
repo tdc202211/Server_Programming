@@ -235,7 +235,18 @@ public class DatabaseConnection {
         }
     }
 
+    public boolean deleteClassById(int classId) {
+        String query = "DELETE FROM classes WHERE \"授業id\" = ?";
+        try (PreparedStatement pstmt = connection.prepareStatement(query)) {
+            pstmt.setInt(1, classId);
 
+            int rowsAffected = pstmt.executeUpdate();
+            return rowsAffected > 0; // 削除成功の場合はtrueを返す
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false; // 削除失敗の場合はfalseを返す
+        }
+    }
 
     
 	// パスワードのハッシュ化
