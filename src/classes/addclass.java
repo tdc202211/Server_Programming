@@ -1,13 +1,16 @@
 package classes;
 
 import java.io.IOException;
+import java.util.List;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
+import connection.ClassInfo;
 import connection.DatabaseConnection;
 import connection.SSHConnection;
 
@@ -41,7 +44,10 @@ public class addclass extends HttpServlet {
 
             if (isAdded) {
                 // 成功したらリダイレクト
-                response.sendRedirect("classListView.jsp");
+            	List<ClassInfo> classList = dbConnection.getAllClasses();
+            	HttpSession session = request.getSession();
+            	session.setAttribute("classList", classList);
+                response.sendRedirect("classView.jsp");
             } else {
                 // エラーの場合
                 request.setAttribute("error", "授業の追加に失敗しました");
