@@ -157,6 +157,48 @@ public class DatabaseConnection {
         }
         return classList;
     }
+    
+    public boolean addUserToBanList(String userId, int commentId) {
+        String banlistQuery = "INSERT INTO banlist (\"ユーザid\", \"コメント\") VALUES (?, ?)";
+        String updateUserQuery = "UPDATE users SET is_banned = TRUE WHERE \"ユーザid\" = ?";
+
+        try {
+            // トランザクション開始
+            connection.setAutoCommit(false);
+
+            // バンリストへの追加
+            try (PreparedStatement pstmtBanlist = connection.prepareStatement(banlistQuery)) {
+                pstmtBanlist.setString(1, userId);
+                pstmtBanlist.setInt(2, commentId);
+                pstmtBanlist.executeUpdate();
+            }
+
+            // ユーザのis_bannedをTRUEに更新
+            try (PreparedStatement pstmtUpdateUser = connection.prepareStatement(updateUserQuery)) {
+                pstmtUpdateUser.setString(1, userId);
+                pstmtUpdateUser.executeUpdate();
+            }
+
+            // コミット
+            connection.commit();
+            return true;
+        } catch (Exception e) {
+            try {
+                // ロールバック
+                connection.rollback();
+            } catch (SQLException rollbackEx) {
+                rollbackEx.printStackTrace();
+            }
+            e.printStackTrace();
+            return false;
+        } finally {
+            try {
+                connection.setAutoCommit(true); // 自動コミットを元に戻す
+            } catch (SQLException autoCommitEx) {
+                autoCommitEx.printStackTrace();
+            }
+        }
+    }
 
  // 授業の追加
     public boolean addClass(String className, int year, String semester, String day, int period, String instructor, String description) {
@@ -194,7 +236,9 @@ public class DatabaseConnection {
         }
     }
 
-	
+
+
+    
 	// パスワードのハッシュ化
     private String hashPassword(String password) {
         try {
