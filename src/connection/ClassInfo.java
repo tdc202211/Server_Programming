@@ -9,8 +9,9 @@ public class ClassInfo {
     private int 時限;
     private String 教授名;
     private String 概要;
+	private int 悪いね;
 
-    public ClassInfo(int 授業id, String 授業名, int 年度, String 前期後期, String 曜日, int 時限, String 教授名, String 概要) {
+    public ClassInfo(int 授業id, String 授業名, int 年度, String 前期後期, String 曜日, int 時限, String 教授名, String 概要, int 悪いね) {
         this.授業id = 授業id;
         this.授業名 = 授業名;
         this.年度 = 年度;
@@ -19,6 +20,7 @@ public class ClassInfo {
         this.時限 = 時限;
         this.教授名 = 教授名;
         this.概要 = 概要;
+        this.悪いね = 悪いね;
     }
 
     // Getters and Setters
@@ -56,6 +58,10 @@ public class ClassInfo {
 
     public String get曜日() {
         return 曜日;
+    }
+    
+    public int get悪いね() {
+    	return 悪いね;
     }
 
     public void set曜日(String 曜日) {

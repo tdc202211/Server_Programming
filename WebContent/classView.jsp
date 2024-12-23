@@ -23,6 +23,7 @@
                 <th>時限</th>
                 <th>教授名</th>
                 <th>概要</th>
+                <th>悪いね<th>
             </tr>
             <%
                 for (ClassInfo classInfo : classList) {
@@ -36,6 +37,7 @@
                 <td><%= classInfo.get時限() %></td>
                 <td><%= classInfo.get教授名() %></td>
                 <td><%= classInfo.get概要() %></td>
+                <td><%= classInfo.get悪いね() %><td>
             </tr>
             <%
                 }

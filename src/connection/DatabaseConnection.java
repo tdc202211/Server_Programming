@@ -110,8 +110,6 @@ public class DatabaseConnection {
 	    return comments;
 	}
 
-
-
 	// 新規ユーザー登録
 	public boolean registerUser(String email, String password) {
 		String hashedPassword = hashPassword(password);
@@ -132,7 +130,7 @@ public class DatabaseConnection {
 	// 授業情報の取得
     public List<ClassInfo> getAllClasses() throws SQLException {
         List<ClassInfo> classList = new ArrayList<>();
-        String sql = "SELECT 授業id, 授業名, 年度, 前期後期, 曜日, 時限, 教授名, 概要 FROM classes";
+        String sql = "SELECT 授業id, 授業名, 年度, 前期後期, 曜日, 時限, 教授名, 概要, 悪いね FROM classes";
         
         try (PreparedStatement statement = connection.prepareStatement(sql);
              ResultSet resultSet = statement.executeQuery()) {
@@ -146,7 +144,8 @@ public class DatabaseConnection {
                         resultSet.getString("曜日"),
                         resultSet.getInt("時限"),
                         resultSet.getString("教授名"),
-                        resultSet.getString("概要")
+                        resultSet.getString("概要"),
+                        resultSet.getInt("悪いね")
                 );
                 classList.add(classInfo);
             }
@@ -156,6 +155,19 @@ public class DatabaseConnection {
             throw new SQLException("Error executing query: " + sql, e);
         }
         return classList;
+    }
+    
+ // 「悪いね」の数を1つ増やす
+    public boolean updateDislikeCount(int classId) {
+        String query = "UPDATE classes SET \"悪いね\" = \"悪いね\" + 1 WHERE \"授業id\" = ?";
+        try (PreparedStatement pstmt = connection.prepareStatement(query)) {
+            pstmt.setInt(1, classId);
+            int rowsAffected = pstmt.executeUpdate();
+            return rowsAffected > 0; // 更新成功の場合はtrueを返す
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false; // 更新失敗の場合はfalseを返す
+        }
     }
     
     public boolean addUserToBanList(String userId) {
