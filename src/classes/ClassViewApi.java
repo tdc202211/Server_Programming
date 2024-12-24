@@ -47,6 +47,7 @@ public class ClassViewApi extends HttpServlet {
                 jsonObject.put("period", classInfo.get時限());
                 jsonObject.put("teacher", classInfo.get教授名());
                 jsonObject.put("description", classInfo.get概要());
+                jsonObject.put("badGoodCount", classInfo.get悪いね()); // 新たに追加
                 jsonArray.put(jsonObject);
             }
 

@@ -8,6 +8,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import banlist.BanList;
 import connection.DatabaseConnection;
 import connection.SSHConnection;
 
@@ -17,10 +18,10 @@ public class CheckEmail2 extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        // CORS対応ヘッダーを追加
+        // CORS対応ヘッダーを設定
         setCorsHeaders(response);
 
-        // リクエストとレスポンスの文字エンコーディングを設定
+        // リクエスト文字エンコーディングを設定
         request.setCharacterEncoding("UTF-8");
         response.setContentType("application/json; charset=UTF-8");
 
@@ -30,26 +31,38 @@ public class CheckEmail2 extends HttpServlet {
         // 接続オブジェクトの初期化
         SSHConnection sshConnection = new SSHConnection();
         DatabaseConnection dbConnection = new DatabaseConnection();
+        BanList banList = null;
 
         try {
-            // SSHトンネルを確立し、データベースに接続
+            // SSH接続とDB接続を確立
             sshConnection.connect();
             dbConnection.connect(sshConnection.getLocalPort());
+            banList = new BanList(dbConnection.getConnection());
 
-            // メールアドレスがデータベースに存在するか確認
+            // メールアドレスが存在するかと、バンリストに含まれているか確認
             boolean exists = dbConnection.isEmailExists(email);
+            boolean isBanned = banList.isBanned(email);
 
-            // JSON形式でレスポンスを返却
-            response.setStatus(HttpServletResponse.SC_OK);
-            response.getWriter().write("{\"exists\": " + exists + "}");
+            if (isBanned) {
+                // メールアドレスがバンリストに含まれている場合
+                response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                response.getWriter().write("{\"exists\": false, \"banned\": true, \"message\": \"このメールアドレスはバンされています。ログインできません。\"}");
+            } else if (exists) {
+                // メールアドレスが存在する場合
+                response.setStatus(HttpServletResponse.SC_OK);
+                response.getWriter().write("{\"exists\": true, \"banned\": false, \"message\": \"メールアドレスが確認されました。\"}");
+            } else {
+                // 存在しない場合
+                response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                response.getWriter().write("{\"exists\": false, \"banned\": false, \"message\": \"メールアドレスが見つかりません。\"}");
+            }
 
         } catch (Exception e) {
-            // サーバーエラー時のエラーログとレスポンス
             e.printStackTrace();
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            response.getWriter().write("{\"exists\": false, \"message\": \"サーバーエラーが発生しました\"}");
+            response.getWriter().write("{\"exists\": false, \"banned\": false, \"message\": \"サーバーエラーが発生しました。\"}");
         } finally {
-            // データベース接続とSSH接続を確実にクローズ
+            // 接続を閉じる
             dbConnection.disconnect();
             sshConnection.disconnect();
         }
@@ -78,7 +91,7 @@ public class CheckEmail2 extends HttpServlet {
      * @param response HttpServletResponseオブジェクト
      */
     private void setCorsHeaders(HttpServletResponse response) {
-        response.setHeader("Access-Control-Allow-Origin", "http://localhost:5173"); // 必要に応じて特定のオリジンを指定
+        response.setHeader("Access-Control-Allow-Origin", "*"); // React.jsのオリジン
         response.setHeader("Access-Control-Allow-Methods", "POST, GET, OPTIONS");
         response.setHeader("Access-Control-Allow-Headers", "Content-Type");
     }
